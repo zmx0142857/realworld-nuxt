@@ -3478,7 +3478,8 @@ input[type=button].btn-block {
 .nav {
  padding-left:0;
  margin-bottom:0;
- list-style:none
+ list-style:none;
+ overflow:auto;
 }
 .nav-link {
  display:inline-block
@@ -4035,7 +4036,8 @@ input[type=button].btn-block {
  padding-left:0;
  margin-top:1rem;
  margin-bottom:1rem;
- border-radius:.25rem
+ border-radius:.25rem;
+ width:max-content;
 }
 .page-item {
  display:inline
@@ -4072,6 +4074,7 @@ input[type=button].btn-block {
  float:left;
  padding:.5rem .75rem;
  margin-left:-1px;
+ margin-top:5px;
  color:#5cb85c;
  text-decoration:none;
  background-color:#fff;

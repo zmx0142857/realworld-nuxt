@@ -46,6 +46,7 @@ const Cookie = process.client ? require('js-cookie') : undefined
 
 export default {
   name: 'Login',
+  middleware: 'unauth',
   computed: {
     isLogin () {
       return this.$route.name === 'login'
@@ -76,7 +77,9 @@ export default {
         // 这一行若放在 try 外面, 请求就出现 CORS 问题, 为什么?
         const loginOrRegister = this.isLogin ? login : register
         const { data } = await loginOrRegister({ user: this.userForm })
-        // console.log(data)
+
+        // 默认头像
+        data.user.image = data.user.image || 'https://zmx0142857.gitee.io/note/img/pikachu.png'
 
         // 保存登录状态
         this.$store.commit('setUser', data.user)

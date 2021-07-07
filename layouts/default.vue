@@ -8,6 +8,7 @@
           <!-- Add "active" class when you're on that page" -->
           <nuxt-link class="nav-link" to="/" exact>Home</nuxt-link>
         </li>
+        <template v-if="user">
         <li class="nav-item">
           <nuxt-link class="nav-link" to="/editor">
             <i class="ion-compose"></i>&nbsp;New Post
@@ -19,13 +20,14 @@
           </nuxt-link>
         </li>
         <li class="nav-item">
-          <nuxt-link class="nav-link" to="/login">Sign in</nuxt-link>
-        </li>
-        <li class="nav-item">
           <nuxt-link class="nav-link" to="/profile/1">
-            <img class="user-pic" src="https://zmx0142857.gitee.io/note/img/pikachu.png" alt="">
-            lpz999
+            <img class="user-pic" :src="user.image" alt="">
+            {{ user.username }}
           </nuxt-link>
+        </li>
+        </template>
+        <li v-else class="nav-item">
+          <nuxt-link class="nav-link" to="/login">Sign in</nuxt-link>
         </li>
       </ul>
     </div>
@@ -43,3 +45,14 @@
   </footer>
 </div>
 </template>
+
+<script>
+import { mapState } from 'vuex'
+
+export default {
+  name: 'DefaultLayout',
+  computed: {
+    ...mapState(['user'])
+  }
+}
+</script>

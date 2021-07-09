@@ -1,4 +1,4 @@
-import request from '@/utils/request'
+import { request } from '@/plugins/request'
 
 // 获取文章标签列表 (前20条)
 export function getTags () {

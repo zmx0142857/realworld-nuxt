@@ -55,11 +55,13 @@
             <div class="info">
               <nuxt-link :to="`/profile/${article.author.username}`"
                 class="author">{{ article.author.username }}</nuxt-link>
-              <span class="date">{{ article.createdAt }}</span>
+              <span class="date">{{ article.createdAt | date('MMM DD, YYYY') }}</span>
             </div>
             <button
               class="btn btn-outline-primary btn-sm pull-xs-right"
               :class="{ active: article.favorited }"
+              @click="onFavorite(article)"
+              :disabled="article.favorited === null"
             >
               <i class="ion-heart"></i> {{ article.favoritesCount }}
             </button>
@@ -109,7 +111,12 @@
 </template>
 
 <script>
-import { getArticles, getArticlesFeed } from '@/api/article'
+import {
+  getArticles,
+  getArticlesFeed,
+  addFavorite,
+  deleteFavorite
+} from '@/api/article'
 import { getTags } from '@/api/tag'
 import { mapState } from 'vuex'
 
@@ -123,7 +130,7 @@ export default {
     const { tag } = query
 
     const fetchArticles = store.state.user && query.tab === 'your_feed'
-      ? getArticlesFeed(store.state.user.token)
+      ? getArticlesFeed
       : getArticles
 
     const [
@@ -153,6 +160,21 @@ export default {
     },
     tab () {
       return this.$route.query.tab || (this.tag ? undefined : 'global_feed')
+    }
+  },
+  methods: {
+    async onFavorite (article) {
+      const fav = article.favorited
+      article.favorited = null // pending
+      if (fav === true) { // 取消点赞
+        await deleteFavorite(article.slug)
+        --article.favoritesCount
+        article.favorited = false
+      } else if (fav === false) { // 添加点赞
+        await addFavorite(article.slug)
+        ++article.favoritesCount
+        article.favorited = true
+      }
     }
   }
 }

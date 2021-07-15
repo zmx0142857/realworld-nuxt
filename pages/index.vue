@@ -11,7 +11,7 @@
   <div class="container page">
     <div class="row">
 
-      <div class="col-md-9">
+      <div class="col-md-9" style="width:100%">
         <div class="feed-toggle">
           <ul class="nav nav-pills outline-active">
             <li class="nav-item" v-if="user">
@@ -60,7 +60,7 @@
             <button
               class="btn btn-outline-primary btn-sm pull-xs-right"
               :class="{ active: article.favorited }"
-              @click="onFavorite(article)"
+              @click="toggleFavorite(article)"
               :disabled="article.favorited === null"
             >
               <i class="ion-heart"></i> {{ article.favoritesCount }}
@@ -72,22 +72,12 @@
             <span>Read more...</span>
           </nuxt-link>
         </div>
+        <p class="article-preview" v-if="!articles.length">No articles are here... yet.</p>
         <!-- /文章列表 -->
 
         <!-- 分页 -->
-        <nav class="nav">
-          <ul class="pagination">
-            <li class="page-item"
-              v-for="n in totalPages" :key="n"
-              :class="{ active: page === n }"
-            >
-              <nuxt-link class="page-link" :to="{
-                name: 'index',
-                query: { page: n, tag, tab }
-              }">{{ n }}</nuxt-link>
-            </li>
-          </ul>
-        </nav>
+        <pagination :page="page" :total-pages="totalPages"
+          name="index" :tag="tag" :tab="tab" />
         <!-- /分页 -->
 
       </div>
@@ -114,14 +104,15 @@
 import {
   getArticles,
   getArticlesFeed,
-  addFavorite,
-  deleteFavorite
+  toggleFavorite
 } from '@/api/article'
 import { getTags } from '@/api/tag'
 import { mapState } from 'vuex'
+import Pagination from '@/components/pagination'
 
 export default {
   name: 'Home',
+  components: { Pagination },
   // 需要 SEO 的数据, 放在 asyncData 中
   // asyncData 方法中不能使用 this
   async asyncData ({ query, store }) {
@@ -163,19 +154,7 @@ export default {
     }
   },
   methods: {
-    async onFavorite (article) {
-      const fav = article.favorited
-      article.favorited = null // pending
-      if (fav === true) { // 取消点赞
-        await deleteFavorite(article.slug)
-        --article.favoritesCount
-        article.favorited = false
-      } else if (fav === false) { // 添加点赞
-        await addFavorite(article.slug)
-        ++article.favoritesCount
-        article.favorited = true
-      }
-    }
+    toggleFavorite
   }
 }
 </script>

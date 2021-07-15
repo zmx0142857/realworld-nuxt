@@ -39,10 +39,7 @@
 </template>
 
 <script>
-import { login, register } from '@/api/user'
-
-// 仅在客户端引入这个包
-const Cookie = process.client ? require('js-cookie') : undefined
+import { login, register, getProfile } from '@/api/user'
 
 export default {
   name: 'Login',
@@ -78,19 +75,13 @@ export default {
         const loginOrRegister = this.isLogin ? login : register
         const { data } = await loginOrRegister({ user: this.userForm })
 
-        // 默认头像
-        data.user.image = data.user.image || 'https://zmx0142857.gitee.io/note/img/pikachu.png'
+        // 获取头像
+        const { data: { profile } } = await getProfile(data.user.username)
+        data.user.image = profile.image
 
         // 保存登录状态
         this.$store.commit('setUser', data.user)
-
-        // 1. 登录状态持久化: 刷新浏览器, cookie 仍存在.
-        // 该 cookie 会随着刷新的请求一起发送到服务端.
-        // 服务端从 cookie 中取出数据, 存入 vuex 即可.
-        // 2. 为避免 CSRF 攻击, 建议为 cookie 设置 SameSite 属性
-        // http://www.ruanyifeng.com/blog/2019/09/cookie-samesite.html
-        Cookie.set('user', data.user, { SameSite: 'Lax' })
-
+        this.$store.commit('setCookie', data.user)
         this.$router.push('/')
       } catch (e) {
         // console.dir(e)

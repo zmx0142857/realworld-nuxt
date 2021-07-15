@@ -10,27 +10,39 @@
     </div>
     <button class="btn btn-sm btn-outline-secondary"
       :class="{ active: article.author.following }"
+      @click="toggleFollow(article.author)"
+      :disabled="article.author.following === null"
     >
       <i class="ion-plus-round"></i>
       &nbsp;
-      Follow Eric Simons <span class="counter">(10)</span>
+      {{ article.author.following ? 'Following' : 'Follow' }} Author
+      <span class="counter">({{ article.author.following ? 11 : 10 }})</span>
     </button>
     &nbsp;&nbsp;
     <button class="btn btn-sm btn-outline-primary"
       :class="{ active: article.favorited }"
+      @click="toggleFavorite(article)"
+      :disabled="article.favorited === null"
     >
       <i class="ion-heart"></i>
       &nbsp;
-      Favorite Post <span class="counter">(29)</span>
+      {{ article.favorited ? 'Favorited' : 'Favorite' }} Post
+      <span class="counter">({{ article.favoritesCount }})</span>
     </button>
   </div>
 </template>
 
 <script>
+import { toggleFavorite } from '@/api/article'
+import { toggleFollow } from '@/api/user'
 export default {
   name: 'ArticleMeta',
   props: {
     article: { type: Object, required: true }
+  },
+  methods: {
+    toggleFavorite,
+    toggleFollow
   }
 }
 </script>

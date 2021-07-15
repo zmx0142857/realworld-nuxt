@@ -20,15 +20,20 @@
           </nuxt-link>
         </li>
         <li class="nav-item">
-          <nuxt-link class="nav-link" to="/profile/1">
+          <nuxt-link class="nav-link" :to="`/profile/${user.username}`">
             <img class="user-pic" :src="user.image" alt="">
             {{ user.username }}
           </nuxt-link>
         </li>
         </template>
-        <li v-else class="nav-item">
-          <nuxt-link class="nav-link" to="/login">Sign in</nuxt-link>
-        </li>
+        <template v-else>
+          <li class="nav-item">
+            <nuxt-link class="nav-link" to="/login">Sign in</nuxt-link>
+          </li>
+          <li class="nav-item">
+            <nuxt-link class="nav-link" to="/register">Sign up</nuxt-link>
+          </li>
+        </template>
       </ul>
     </div>
   </nav>

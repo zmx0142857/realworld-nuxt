@@ -12,7 +12,7 @@
         <a class="page-link" href="javascript:void 0">...</a>
       </li>
       <li class="page-item"
-        v-for="n in Math.min(totalPages-5, 5)"
+        v-for="n in Math.min(Math.max(totalPages-5, 0), 5)"
         :key="lastPages(n)"
         :class="{ active: page === lastPages(n) }"
       >

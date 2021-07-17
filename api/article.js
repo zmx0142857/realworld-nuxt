@@ -58,21 +58,21 @@ export function getArticle (slug) {
 }
 
 // 新建文章
-export function addArticle (data) {
+export function addArticle (article) {
   return request({
     method: 'POST',
     url: '/api/articles',
-    data
+    data: { article }
   })
 }
 
 // 修改文章
 // 修改 article.title 后 slug 也会更新
-export function setArticle (slug, data) {
+export function setArticle (slug, article) {
   return request({
     method: 'PUT',
     url: '/api/articles/' + slug,
-    data
+    data: { article }
   })
 }
 

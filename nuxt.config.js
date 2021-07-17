@@ -7,6 +7,11 @@ module.exports = {
           path: '/register',
           name: 'register',
           component: resolve(__dirname, 'pages/login.vue')
+        },
+        {
+          path: '/editor/:slug',
+          name: 'edit-article',
+          component: resolve(__dirname, 'pages/editor.vue')
         }
       ])
     }

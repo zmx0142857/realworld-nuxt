@@ -77,6 +77,7 @@ export default {
       const { data } = await setProfile(user)
       data.user.image = this.user.image
       this.setUser(data.user)
+      this.setCookie(data.user)
     }
   }
 }

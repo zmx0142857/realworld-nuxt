@@ -45,40 +45,11 @@
         </div>
 
         <!-- 文章列表 -->
-        <div v-for="article in articles" :key="article.slug"
-          class="article-preview"
-        >
-          <div class="article-meta">
-            <nuxt-link :to="`/profile/${article.author.username}`">
-              <img :src="article.author.image" />
-            </nuxt-link>
-            <div class="info">
-              <nuxt-link :to="`/profile/${article.author.username}`"
-                class="author">{{ article.author.username }}</nuxt-link>
-              <span class="date">{{ article.createdAt | date('MMM DD, YYYY') }}</span>
-            </div>
-            <button
-              class="btn btn-outline-primary btn-sm pull-xs-right"
-              :class="{ active: article.favorited }"
-              @click="toggleFavorite(article)"
-              :disabled="article.favorited === null"
-            >
-              <i class="ion-heart"></i> {{ article.favoritesCount }}
-            </button>
-          </div>
-          <nuxt-link :to="`/article/${article.slug}`" class="preview-link">
-            <h1>{{ article.title }}</h1>
-            <p>{{ article.description }}</p>
-            <span>Read more...</span>
-          </nuxt-link>
-        </div>
-        <p class="article-preview" v-if="!articles.length">No articles are here... yet.</p>
-        <!-- /文章列表 -->
+        <article-list :articles="articles"/>
 
         <!-- 分页 -->
-        <pagination :page="page" :total-pages="totalPages"
-          name="index" :tag="tag" :tab="tab" />
-        <!-- /分页 -->
+        <pagination v-if="totalPages > 1" name="index"
+          :page="page" :total-pages="totalPages" :tag="tag" :tab="tab" />
 
       </div>
 
@@ -101,18 +72,15 @@
 </template>
 
 <script>
-import {
-  getArticles,
-  getArticlesFeed,
-  toggleFavorite
-} from '@/api/article'
+import { getArticles, getArticlesFeed } from '@/api/article'
 import { getTags } from '@/api/tag'
 import { mapState } from 'vuex'
 import Pagination from '@/components/pagination'
+import ArticleList from '@/components/article-list'
 
 export default {
   name: 'Home',
-  components: { Pagination },
+  components: { Pagination, ArticleList },
   // 需要 SEO 的数据, 放在 asyncData 中
   // asyncData 方法中不能使用 this
   async asyncData ({ query, store }) {
@@ -152,9 +120,6 @@ export default {
     tab () {
       return this.$route.query.tab || (this.tag ? undefined : 'global_feed')
     }
-  },
-  methods: {
-    toggleFavorite
   }
 }
 </script>

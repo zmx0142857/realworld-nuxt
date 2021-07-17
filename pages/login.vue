@@ -27,6 +27,8 @@
           <fieldset class="form-group">
             <input v-model="userForm.password" class="form-control form-control-lg" type="password" placeholder="Password" required minlength="8">
           </fieldset>
+          <!-- button 是 form 的最后一个元素时, 默认的 type="submit" -->
+          <!-- 点击此按钮会触发 form 的 submit 事件 -->
           <button class="btn btn-lg btn-primary pull-xs-right">
             {{ titleText }}
           </button>

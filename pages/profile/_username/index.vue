@@ -6,15 +6,29 @@
       <div class="row">
 
         <div class="col-xs-12 col-md-10 offset-md-1">
-          <img src="http://i.imgur.com/Qr71crq.jpg" class="user-img" />
-          <h4>Eric Simons</h4>
-          <p>
-            Cofounder @GoThinkster, lived in Aol's HQ for a few months, kinda looks like Peeta from the Hunger Games
-          </p>
-          <button class="btn btn-sm btn-outline-secondary action-btn">
+          <img :src="profile.image" class="user-img" />
+          <h4>{{ profile.username }}</h4>
+          <p>{{ profile.bio }}</p>
+          <!-- 用户自己, 展示 settings 按钮 -->
+          <nuxt-link class="btn btn-sm btn-outline-secondary action-btn"
+            v-if="profile.username === user.username"
+            to="/settings"
+          >
+            <i class="ion-gear-a"></i>
+            &nbsp;
+            Edit Profile Settings
+          </nuxt-link>
+          <!-- 其他用户, 展示关注按钮 -->
+          <button class="btn btn-sm btn-outline-secondary pull-xs-right"
+            v-else
+            :class="{ active: profile.following }"
+            @click="toggleFollow(profile)"
+            :disabled="profile.following === null"
+          >
             <i class="ion-plus-round"></i>
             &nbsp;
-            Follow Eric Simons 
+            {{ profile.following ? 'Unfollow' : 'Follow' }}
+            {{ profile.username }}
           </button>
         </div>
 
@@ -29,57 +43,36 @@
         <div class="articles-toggle">
           <ul class="nav nav-pills outline-active">
             <li class="nav-item">
-              <a class="nav-link active" href="">My Articles</a>
+              <nuxt-link class="nav-link"
+                :class="{ active: tab === 'my' }"
+                :to="{
+                  name: 'profile-username',
+                  query: { tab: 'my' }
+                }"
+                exact
+              >My Articles</nuxt-link>
             </li>
             <li class="nav-item">
-              <a class="nav-link" href="">Favorited Articles</a>
+              <nuxt-link class="nav-link"
+                :class="{ active: tab === 'favorites' }"
+                :to="{
+                  name: 'profile-username',
+                  query: { tab: 'favorites' }
+                }"
+                exact
+              >Favorited Articles</nuxt-link>
             </li>
           </ul>
         </div>
 
-        <div class="article-preview">
-          <div class="article-meta">
-            <a href=""><img src="http://i.imgur.com/Qr71crq.jpg" /></a>
-            <div class="info">
-              <a href="" class="author">Eric Simons</a>
-              <span class="date">January 20th</span>
-            </div>
-            <button class="btn btn-outline-primary btn-sm pull-xs-right">
-              <i class="ion-heart"></i> 29
-            </button>
-          </div>
-          <a href="" class="preview-link">
-            <h1>How to build webapps that scale</h1>
-            <p>This is the description for the post.</p>
-            <span>Read more...</span>
-          </a>
-        </div>
+        <!-- 文章列表 -->
+        <article-list :articles="articles" />
 
-        <div class="article-preview">
-          <div class="article-meta">
-            <a href=""><img src="http://i.imgur.com/N4VcUeJ.jpg" /></a>
-            <div class="info">
-              <a href="" class="author">Albert Pai</a>
-              <span class="date">January 20th</span>
-            </div>
-            <button class="btn btn-outline-primary btn-sm pull-xs-right">
-              <i class="ion-heart"></i> 32
-            </button>
-          </div>
-          <a href="" class="preview-link">
-            <h1>The song you won't ever stop singing. No matter how hard you try.</h1>
-            <p>This is the description for the post.</p>
-            <span>Read more...</span>
-            <ul class="tag-list">
-              <li class="tag-default tag-pill tag-outline">Music</li>
-              <li class="tag-default tag-pill tag-outline">Song</li>
-            </ul>
-          </a>
-        </div>
-
+        <!-- 分页 -->
+        <pagination v-if="totalPages > 1" name="profile-username"
+          :page="page" :total-pages="totalPages" :tab="tab" />
 
       </div>
-
     </div>
   </div>
 
@@ -87,11 +80,59 @@
 </template>
 
 <script>
+import { mapState } from 'vuex'
+import { getProfile, toggleFollow } from '@/api/user'
+import { getArticles } from '@/api/article'
+import ArticleList from '@/components/article-list'
+import Pagination from '@/components/pagination'
+
 export default {
   name: 'Profile',
-  middleware: 'auth'
+  middleware: 'auth',
+  components: { ArticleList, Pagination },
+  async asyncData ({ params, query }) {
+    const limit = 5
+    const page = Number.parseInt(query.page) || 1
+    const queryParams = {}
+    if (query.tab === 'favorites') {
+      queryParams.favorited = params.username
+    } else {
+      queryParams.author = params.username
+    }
+
+    const [
+      { data: { profile } },
+      { data: { articles, articlesCount } }
+    ] = await Promise.all([
+      getProfile(params.username),
+      getArticles({
+        limit,
+        offset: (page - 1) * limit,
+        ...queryParams
+      })
+    ])
+
+    return {
+      profile,
+      articles,
+      page,
+      totalPages: Math.ceil(articlesCount / limit),
+    }
+  },
+  computed: {
+    ...mapState(['user']),
+    tab () {
+      return this.$route.query.tab || 'my'
+    }
+  },
+  watchQuery: ['page', 'tab'],
+  head () {
+    return {
+      title: `Profile of ${this.profile.username} - RealWorld`,
+    }
+  },
+  methods: {
+    toggleFollow
+  }
 }
 </script>
-
-<style scoped>
-</style>

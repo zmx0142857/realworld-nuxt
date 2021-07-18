@@ -19,5 +19,9 @@ module.exports = {
   plugins: [
     '~/plugins/request.js',
     '~/plugins/dayjs.js'
-  ]
+  ],
+  server: {
+    host: '0.0.0.0', // '0.0.0.0' 表示外部可访问; 默认是 'localhost'
+    port: 3000
+  }
 }

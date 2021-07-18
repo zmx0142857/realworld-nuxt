@@ -2,16 +2,19 @@
 
 利用 vue + nuxt 技术栈实现的 realworld 前端应用.
 
-我的网址: ??
+我的网址: 👉 http://106.75.9.115:3000/
 
 官方 demo: https://demo.realworld.io/
+
+## scripts
 
 - `npm install`: 安装依赖
 - `npm run dev`: 运行开发服务器
 - `npm run build`: 构建应用
 - `npm run start`: 构建完毕后, 以生产模式运行应用
 
-功能:
+## 功能
+
 - [x] 注册/登录/退出
 - [x] 列表/分页/标签
 - [x] 点赞/取消点赞, 关注/取消关注
@@ -19,6 +22,45 @@
 - [x] settings - 个人信息更新
 - [x] 文章发表/修改/删除
 - [x] 个人中心/我的文章/我点赞的文章
+
+## 部署方法
+
+- 购买服务器
+- 在 web 控制台设置外网防火墙规则, 保留需要的 22 端口和 3000 端口即可
+- 用 ssh 登陆服务器, 安装必要的软件 `nodejs >= 14`, `npm`, `firewalld` 等
+- 启动服务器自己的防火墙（区别于外网防火墙）
+  ```
+  sudo firewall-cmd --zone=public --add-port=3000/tcp --permanent
+  sudo firewall-cmd --reload
+  sudo firewall-cmd --list-ports
+  ```
+- 编辑 `/etc/hosts` 文件, 加入 github 地址
+- 压缩项目, 传到服务端的一个新目录中, 再解压
+  ```
+  zip realworld-nuxt.zip -r .nuxt/ static/ nuxt.config.js package.json package-lock.json
+  ```
+- 执行 `npm install` 安装依赖, `sudo npm install -g pm2` 安装 pm2.
+  启动应用 `pm2 reload pm2.config.json`:
+  ```
+  {
+    "apps": [{
+      "name": "RealWorld",
+      "script": "npm",
+      "args": "start"
+    }]
+  }
+  ```
+
+## 持续集成/持续部署
+
+- 生成 [github access token](https://github.com/settings/tokens), 勾选第一类 repo 权限即可. 该 token 只显示一次, 记得及时复制下来.
+- 配置到项目的 settings/secrets (https://github.com/zmx0142857/realworld-nuxt/settings/secrets) 中
+- 配置 [github action 脚本](https://gist.github.com/lipengzhou/b92f80142afa37aea397da47366bd872): `.github/workflows/main.yml`
+- 将标签推送到远程仓库, 这将触发 github action:
+  ```
+  $ git tag v0.1.0
+  $ git push origin v0.1.0
+  ```
 
 <!--
 **要求**
@@ -53,7 +95,7 @@ vim  /etc/hosts
 ESC   :wq
 
 # 4)在服务器上安装 nvm   参考: https://github.com/nvm-sh/nvm
-wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+curl -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
 
 # 5)重启ssh终端后, 查看 nvm 版本
 nvm --version
@@ -69,17 +111,11 @@ npm i pm2 -g
 ```
 
 pm2  list         查看应用列表
-
 pm2  start      启动应用
-
 pm2  stop      停止应用
-
 pm2  reload   重载应用
-
 pm2  restart   重启应用
-
 pm2  delete    删除应用
-
 pm2  log   xx   查看出错日志    xx为应用名称
 
 **找不到 npm、pm2**
